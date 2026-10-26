@@ -29,7 +29,7 @@ export async function Header() {
   return (
     <>
       {home.announcement && (
-        <div className="bg-charcoal px-4 py-2 text-center text-[12px] tracking-[0.12em] text-cream/90">{home.announcement}</div>
+        <div className="bg-blush-light px-4 py-2 text-center text-[13px] text-charcoal-soft">{home.announcement}</div>
       )}
       <header className="sticky top-0 z-40 border-b border-charcoal/5 bg-cream/90 backdrop-blur supports-[backdrop-filter]:bg-cream/80">
         <div className="container-page flex h-[72px] items-center gap-4">

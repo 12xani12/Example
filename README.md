@@ -54,7 +54,7 @@ newsletter subscribers (CSV export), business/GST/download settings and integrat
 **Emails** — order confirmation (receipt or tax invoice depending on GST settings), "your download is
 ready", fresh purchase links, password reset, contact notification, newsletter confirm & welcome.
 
-**Sample content** — 21 demonstration products with generated floral artwork and mockups, 36 categories.
+**Sample content** — 27 demonstration products with generated floral artwork and mockups, 36 categories.
 Every sample product is flagged **Sample** and **cannot be bought** until you replace its files and
 untick “Sample / demonstration product”.
 

@@ -42,3 +42,8 @@ export const ResetIcon = (p: P) => base(p, <><path d="M4 12a8 8 0 1 0 2.4-5.7" /
 export const InstagramIcon = (p: P) => base(p, <><rect x="4" y="4" width="16" height="16" rx="4.5" /><circle cx="12" cy="12" r="3.6" /><path d="M16.8 7.2h.01" /></>);
 export const PinterestIcon = (p: P) => base(p, <><circle cx="12" cy="12" r="8.5" /><path d="M10.8 9.5c.5-1.6 3.8-1.8 4.2.6.4 2.5-1.6 4.6-3.1 3.6M11.7 10.5 9.8 19" /></>);
 export const FacebookIcon = (p: P) => base(p, <path d="M14 8.5h2.5V5H14c-2 0-3.5 1.6-3.5 3.6V11H8v3.4h2.5V21H14v-6.6h2.5L17 11h-3V9c0-.3.2-.5.5-.5Z" />);
+export const ImageIcon = (p: P) => base(p, <><rect x="4" y="5" width="16" height="14" rx="2" /><circle cx="9" cy="10" r="1.6" /><path d="m5 18 5-5 3 3 2.5-2.5L20 17" /></>);
+export const DocumentIcon = (p: P) => base(p, <><path d="M7 3h7l4 4v14H7z" /><path d="M14 3v4h4M10 12h5M10 16h5" /></>);
+export const LeafIcon = (p: P) => base(p, <><path d="M5 19c0-8 5-13 14-14-1 9-6 14-14 14Z" /><path d="M5 19 13 11" /></>);
+export const EnvelopeIcon = (p: P) => base(p, <><rect x="3.5" y="6" width="17" height="12" rx="1.5" /><path d="m4 7 8 6 8-6" /></>);
+export const CheckCircleIcon = (p: P) => base(p, <><circle cx="12" cy="12" r="8.5" /><path d="m8.5 12.3 2.3 2.3 4.7-4.9" /></>);

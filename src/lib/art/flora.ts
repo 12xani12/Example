@@ -240,3 +240,74 @@ export function paper(w: number, h: number, base: string, wash: string, seed: nu
   return `<defs><radialGradient id="${id}" cx="30%" cy="20%" r="90%"><stop offset="0" stop-color="${wash}" stop-opacity="0.9"/><stop offset="1" stop-color="${base}" stop-opacity="1"/></radialGradient></defs>
   <rect width="${f(w)}" height="${f(h)}" fill="url(#${id})"/>${specks}`;
 }
+
+/** Hand-painted style wildflower: thin stem, a few leaves and a simple open bloom. */
+export function wildflower(x: number, baseY: number, height: number, colour: string, seed: number, kind: 0 | 1 | 2 | 3 = 0) {
+  const rand = rng(seed);
+  const lean = (rand() - 0.5) * height * 0.25;
+  const tx = x + lean, ty = baseY - height;
+  const parts = [`<path d="M${f(x)} ${f(baseY)} Q${f(x + lean * 0.2)} ${f(baseY - height * 0.5)} ${f(tx)} ${f(ty)}" stroke="${ART.leafDeep}" stroke-width="${f(Math.max(1, height * 0.012))}" fill="none" stroke-linecap="round"/>`];
+  for (let i = 0; i < 2; i++) {
+    const t = 0.35 + i * 0.25;
+    const lx = x + lean * t * 0.6, ly = baseY - height * t;
+    parts.push(leaf(lx, ly, height * 0.16, i % 2 ? -35 : -145, i % 2 ? ART.leaf : ART.leafDeep, false));
+  }
+  const r = height * (0.09 + rand() * 0.03);
+  if (kind === 0) parts.push(blossom(tx, ty, r, colour, ART.gold, rand() * 72));
+  else if (kind === 1) {
+    // Cosmos-style: 8 rounded petals.
+    parts.push(`<g transform="translate(${f(tx)} ${f(ty)})">${Array.from({ length: 8 }, (_, i) => `<ellipse cx="0" cy="${f(-r * 0.62)}" rx="${f(r * 0.32)}" ry="${f(r * 0.62)}" transform="rotate(${i * 45 + rand() * 10})" fill="${colour}" fill-opacity="0.92"/>`).join("")}<circle r="${f(r * 0.22)}" fill="${ART.gold}"/></g>`);
+  } else if (kind === 2) {
+    // Lavender / snapdragon spike.
+    for (let i = 0; i < 7; i++) parts.push(`<ellipse cx="${f(tx + (i % 2 ? 1 : -1) * r * 0.25)}" cy="${f(ty + i * r * 0.45)}" rx="${f(r * 0.28)}" ry="${f(r * 0.36)}" fill="${colour}" fill-opacity="${f(0.95 - i * 0.07)}"/>`);
+  } else {
+    parts.push(daisy(tx, ty, r * 1.1, colour, ART.butter, rand() * 30));
+  }
+  return parts.join("");
+}
+
+/** A meadow of wildflowers along a baseline. */
+export function meadow(x0: number, x1: number, baseY: number, maxH: number, seed: number, colours = [ART.blushDeep, ART.lavender, ART.apricot, ART.butter, ART.rose, ART.white]) {
+  const rand = rng(seed);
+  const out: string[] = [];
+  const n = Math.round((x1 - x0) / 22);
+  for (let i = 0; i < n; i++) {
+    const x = x0 + ((i + rand() * 0.8) / n) * (x1 - x0);
+    out.push(wildflower(x, baseY + rand() * 6, maxH * (0.55 + rand() * 0.45), colours[Math.floor(rand() * colours.length)], seed * 31 + i, Math.floor(rand() * 4) as 0 | 1 | 2 | 3));
+  }
+  return out.join("");
+}
+
+export const KRAFT = { light: "#E9DAC6", mid: "#D9C2A2", dark: "#B99671", twine: "#F4EBDD" };
+
+/** Kraft-paper gift box seen front-on, tied with twine. */
+export function giftBox(x: number, y: number, w: number, h: number, rot = 0) {
+  return `<g transform="translate(${f(x)} ${f(y)}) rotate(${f(rot)})">
+    <rect x="${f(-w / 2 + 6)}" y="${f(-h / 2 + 12)}" width="${f(w)}" height="${f(h)}" rx="4" fill="#3a2a28" opacity="0.18" filter="url(#sh)"/>
+    <rect x="${f(-w / 2)}" y="${f(-h / 2)}" width="${f(w)}" height="${f(h)}" rx="4" fill="${KRAFT.mid}"/>
+    <rect x="${f(-w / 2 - 4)}" y="${f(-h / 2)}" width="${f(w + 8)}" height="${f(h * 0.22)}" rx="4" fill="${KRAFT.light}"/>
+    <rect x="${f(-w * 0.04)}" y="${f(-h / 2)}" width="${f(w * 0.08)}" height="${f(h)}" fill="${KRAFT.twine}"/>
+    <rect x="${f(-w / 2 - 4)}" y="${f(-h * 0.02)}" width="${f(w + 8)}" height="${f(h * 0.06)}" fill="${KRAFT.twine}" opacity="0.9"/>
+    <path d="M0 ${f(-h / 2)} c${f(-w * 0.25)} ${f(-h * 0.25)} ${f(-w * 0.3)} ${f(h * 0.05)} 0 0 c${f(w * 0.3)} ${f(h * 0.05)} ${f(w * 0.25)} ${f(-h * 0.25)} 0 0" stroke="${KRAFT.twine}" stroke-width="${f(w * 0.035)}" fill="none"/>
+  </g>`;
+}
+
+/** Big glossy houseplant leaves (pothos-like) radiating from a point. */
+export function plant(x: number, y: number, size: number, seed: number) {
+  const rand = rng(seed);
+  return Array.from({ length: 9 }, (_, i) => {
+    const a = -170 + i * 22 + rand() * 12;
+    const len = size * (0.6 + rand() * 0.4);
+    const col = i % 3 === 0 ? ART.leafDark : i % 3 === 1 ? ART.leafDeep : "#6E8A63";
+    return `<g transform="translate(${f(x)} ${f(y)}) rotate(${f(a)})">
+      <path d="M0 0 L${f(len * 0.45)} 0" stroke="${ART.leafDark}" stroke-width="${f(size * 0.02)}"/>
+      <path d="M${f(len * 0.4)} 0 C${f(len * 0.55)} ${f(-len * 0.3)} ${f(len * 0.95)} ${f(-len * 0.25)} ${f(len)} 0 C${f(len * 0.95)} ${f(len * 0.25)} ${f(len * 0.55)} ${f(len * 0.3)} ${f(len * 0.4)} 0Z" fill="${col}"/>
+      <path d="M${f(len * 0.42)} 0 L${f(len * 0.96)} 0" stroke="#ffffff" stroke-opacity="0.3" stroke-width="${f(size * 0.01)}"/>
+    </g>`;
+  }).join("");
+}
+
+/** Small hand-drawn doodles (hearts, swashes) used as accents. */
+export function doodleHeart(x: number, y: number, s: number, colour: string) {
+  return `<path transform="translate(${f(x)} ${f(y)}) scale(${f(s / 10)})" d="M5 9C2 7 .3 5 .5 3 .7 1 2.7.2 4.2 1.3L5 2.2 5.9 1.3C7.4.1 9.4 1 9.5 3 9.7 5 8 7 5 9Z" fill="none" stroke="${colour}" stroke-width="${f(10 / s * 1.4)}" stroke-linecap="round" stroke-linejoin="round"/>`;
+}

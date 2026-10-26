@@ -8,7 +8,7 @@ import { env } from "@/lib/env";
 import { ProductGallery } from "@/components/ProductGallery";
 import { PurchaseOptions } from "@/components/PurchaseOptions";
 import { ProductGrid } from "@/components/ProductCard";
-import { CheckIcon, DownloadIcon, LockIcon, PrinterIcon, PhoneIcon } from "@/components/Icons";
+import { CheckCircleIcon, CheckIcon, ChevronDown, DownloadIcon, LockIcon, PrinterIcon, PhoneIcon } from "@/components/Icons";
 
 export const dynamic = "force-dynamic";
 
@@ -30,9 +30,9 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 function Section({ title, children, open = false }: { title: string; children: React.ReactNode; open?: boolean }) {
   return (
     <details open={open} className="group border-b border-charcoal/10 py-5">
-      <summary className="flex cursor-pointer list-none items-center justify-between font-serif text-2xl">
+      <summary className="flex cursor-pointer list-none items-center justify-between text-[17px] font-medium">
         {title}
-        <span aria-hidden="true" className="text-rose-deep transition group-open:rotate-45">+</span>
+        <ChevronDown size={20} className="text-charcoal-soft transition group-open:rotate-180" />
       </summary>
       <div className="prose-cardly mt-4 text-[16px]">{children}</div>
     </details>
@@ -110,8 +110,8 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
 
           <div>
             <p className="eyebrow">{PRODUCT_TYPE_LABELS[product.type]}</p>
-            <h1 className="mt-2 text-4xl leading-tight sm:text-5xl">{product.title}</h1>
-            <p className="mt-3 text-2xl">
+            <h1 className="mt-2 text-4xl leading-tight sm:text-[2.8rem]">{product.title}</h1>
+            <p className="mt-3 text-2xl font-medium">
               {prices.length > 1 ? `${formatAudShort(Math.min(...prices))} – ${formatAudShort(Math.max(...prices))}` : formatAudShort(prices[0] ?? 0)}{" "}
               <span className="text-sm text-charcoal-muted">AUD</span>
             </p>
@@ -120,16 +120,16 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
             )}
             <p className="mt-5 text-[17px] leading-relaxed text-charcoal-soft">{product.shortDescription}</p>
 
-            <dl className="mt-6 grid grid-cols-2 gap-3 text-[14px]">
-              <div className="rounded-2xl bg-white p-4 shadow-soft">
-                <dt className="text-charcoal-muted">Format</dt>
-                <dd className="mt-0.5 font-medium">{FORMAT_LABELS[product.format]}</dd>
-              </div>
-              <div className="rounded-2xl bg-white p-4 shadow-soft">
-                <dt className="text-charcoal-muted">Size</dt>
-                <dd className="mt-0.5 font-medium">{product.sizeInfo || "See description"}</dd>
-              </div>
-            </dl>
+            <ul className="mt-5 space-y-2 text-[15px]">
+              {[
+                isVirtual ? "Instant download — PNG images and a digital PDF" : "Instant PDF download",
+                isVirtual ? "Phone-friendly, ready to share" : "High-quality, print-ready file",
+                product.sizeInfo || FORMAT_LABELS[product.format],
+                "Unlimited personal use",
+              ].map((t) => (
+                <li key={t} className="flex items-start gap-2.5"><CheckCircleIcon size={20} className="mt-0.5 shrink-0 text-rose-deep" /> {t}</li>
+              ))}
+            </ul>
 
             <div className="mt-7">
               <PurchaseOptions productId={product.id} slug={product.slug} options={options} isVirtual={isVirtual} unavailableReason={unavailableReason} />
@@ -146,7 +146,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
           </div>
         </div>
 
-        <div className="mx-auto mt-16 max-w-3xl">
+        <div className="mx-auto mt-14 max-w-3xl border-t border-charcoal/10">
           <Section title="Description" open>
             {product.description.split(/\n{2,}/).map((p, i) => <p key={i}>{p}</p>)}
           </Section>

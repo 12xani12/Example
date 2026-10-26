@@ -10,7 +10,7 @@ import bcrypt from "bcryptjs";
 import sharp from "sharp";
 import { PDFDocument } from "pdf-lib";
 import { CARD_DESIGNS, DOWNLOAD_DESIGNS, insideArtwork, type DesignId, type DownloadDesign } from "../src/lib/art/designs";
-import { a4Mockup, categoryTile, heroComposition, insideMockup, lifestyleMockup, promoComposition } from "../src/lib/art/mockups";
+import { a4Mockup, categoryBanner, categoryTile, deskScene, heroComposition, insideMockup, lifestyleMockup, promoCard } from "../src/lib/art/mockups";
 import { storePrivateArtwork, storePublicImage } from "../src/lib/images";
 import { storage } from "../src/lib/storage";
 import { renderMessagePng } from "../src/lib/files/card-files";
@@ -59,11 +59,11 @@ async function seedSettings() {
   const home = await prisma.setting.findUnique({ where: { key: "homepage" } });
   if (home && !reset) return;
   const hero = await storePublicImage(
-    await sharp(Buffer.from(heroComposition([await designPng("birthday-blooms", 900), await designPng("thank-you", 900), await designPng("make-a-wish", 900)]))).png().toBuffer(),
+    await sharp(Buffer.from(heroComposition([await designPng("birthday-blooms", 900), await designPng("you-are-amazing", 900)]))).png().toBuffer(),
     "site",
   );
   const promo = await storePublicImage(
-    await sharp(Buffer.from(promoComposition([await designPng("congratulations", 800), await designPng("virtual-bouquet", 800)]))).png().toBuffer(),
+    await sharp(Buffer.from(deskScene(await render(promoCard(), 800)))).png().toBuffer(),
     "site",
   );
   await prisma.setting.upsert({
@@ -84,13 +84,16 @@ async function seedCategories() {
     const existing = await prisma.category.findUnique({ where: { slug: c.slug } });
     if (existing) continue;
     let imageKey: string | null = null;
+    const festive = /birthday|celebration|congratulations|graduation|party|games/.test(c.slug);
+    const banner = await render(categoryBanner(festive ? "balloons" : "florals", order));
+    const bannerKey = (await storePublicImage(banner, "categories")).key;
     if (c.tile) {
       const png = await designPng(c.tile.design, 900);
-      const portrait = !["planner", "giftTags", "wallArt", "checklist"].includes(c.tile.design);
+      const portrait = !["planner", "giftTags", "checklist"].includes(c.tile.design);
       const tile = await render(categoryTile(png, c.tile.tone, order, portrait));
       imageKey = (await storePublicImage(tile, "categories")).key;
     }
-    await prisma.category.create({ data: { name: c.name, slug: c.slug, group: c.group, description: c.description, sortOrder: order, showOnHome: !!c.home, imageKey } });
+    await prisma.category.create({ data: { name: c.name, slug: c.slug, group: c.group, description: c.description, sortOrder: order, showOnHome: !!c.home, imageKey, bannerKey } });
   }
   console.log(`Categories: ${await prisma.category.count()}`);
 }
@@ -173,7 +176,7 @@ async function seedProducts() {
         ],
       });
     } else {
-      const portraitA4 = p.art.card ? false : true;
+      const portraitA4 = p.art.kind === "print" || !p.art.card;
       const png = await designPng(p.art.design, 2480);
       const frontImg = await storePublicImage(png, folder);
       const mock = await storePublicImage(

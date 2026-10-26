@@ -1,5 +1,5 @@
 // Sample artwork for Cardly's demonstration products.
-import { ART, balloon, berries, blossom, cluster, confetti, daisy, eucalyptus, heart, hollyLeaf, leaf, paper, rng, sprig, star, wreath } from "./flora";
+import { ART, balloon, berries, blossom, cluster, confetti, daisy, doodleHeart, eucalyptus, heart, hollyLeaf, leaf, meadow, paper, rng, sprig, star, wreath } from "./flora";
 import { svgText } from "./text";
 
 const W = 420;
@@ -17,16 +17,16 @@ const caps = (text: string, y: number, size = 13, fill = ART.charcoal, tracking 
 export type DesignId =
   | "birthday-blooms" | "confetti-celebration" | "make-a-wish" | "amazing-year" | "age-number" | "birthday-smiles"
   | "congratulations" | "thank-you" | "thinking-of-you" | "merry-christmas" | "anniversary" | "new-baby"
-  | "wedding" | "virtual-bouquet" | "virtual-congrats" | "virtual-thanks";
+  | "wedding" | "virtual-bouquet" | "virtual-congrats" | "virtual-thanks"
+  | "you-are-amazing" | "good-things" | "dream-plan" | "just-because" | "thank-you-hand" | "birthday-balloons";
 
 export const CARD_DESIGNS: Record<DesignId, () => string> = {
   "birthday-blooms": () =>
     card(`${paper(W, H, ART.cream, ART.blush, 11)}
-      ${wreath(W / 2, 262, 142, 21, 5, "rose")}
-      ${svgText("script", "Happy", W / 2, 250, 48, ART.charcoal, { anchor: "middle" })}
-      ${svgText("script", "Birthday", W / 2, 302, 50, ART.roseDeep, { anchor: "middle" })}
-      ${caps("to you", 470, 12, ART.charcoal, 6)}
-      ${heart(W / 2, 498, 10, ART.rose)}`),
+      ${svgText("script", "Happy", W / 2 - 6, 168, 76, ART.roseDeep, { anchor: "middle" })}
+      ${svgText("script", "Birthday", W / 2 + 10, 250, 76, ART.roseDeep, { anchor: "middle" })}
+      ${meadow(20, 400, 600, 300, 7)}
+      ${meadow(40, 380, 610, 220, 9)}`),
 
   "confetti-celebration": () =>
     card(`${paper(W, H, ART.cream, ART.peach, 12)}
@@ -193,6 +193,43 @@ export const CARD_DESIGNS: Record<DesignId, () => string> = {
       ${ring}
       ${svgText("script", "Thanks a", W / 2, 278, 50, ART.charcoal, { anchor: "middle" })}
       ${svgText("script", "Bunch", W / 2, 336, 58, ART.roseDeep, { anchor: "middle" })}`);
+  },
+  "you-are-amazing": () =>
+    card(`${paper(W, H, "#FBF6EF", ART.cream, 41)}
+      ${["YOU", "ARE", "AMAZING"].map((w, i) => svgText("sans", w, W / 2, 236 + i * 52, 38, ART.charcoal, { anchor: "middle", tracking: 9 })).join("")}
+      ${heart(W / 2, 420, 16, ART.rose)}`),
+
+  "good-things": () =>
+    card(`${paper(W, H, ART.cream, ART.peach, 42)}
+      ${svgText("hand", "Good", W / 2, 220, 72, ART.charcoal, { anchor: "middle" })}
+      ${svgText("hand", "Things", W / 2, 290, 72, ART.charcoal, { anchor: "middle" })}
+      ${svgText("hand", "Take Time", W / 2, 360, 66, ART.charcoal, { anchor: "middle" })}
+      <path d="M140 410 h48 m44 0 h48" stroke="${ART.charcoal}" stroke-width="1.6" stroke-linecap="round"/>
+      ${heart(W / 2, 410, 12, ART.rose)}`),
+
+  "dream-plan": () =>
+    card(`${paper(W, H, "#FBF3EC", ART.blush, 43)}
+      ${["DREAM", "PLAN", "DO", "REPEAT"].map((w, i) => svgText("sansMedium", w, W / 2, 210 + i * 58, 34, ART.charcoal, { anchor: "middle", tracking: 10 })).join("")}`),
+
+  "just-because": () =>
+    card(`${paper(W, H, "#F2B7B6", ART.blush, 44)}
+      ${heart(W / 2, 205, 70, ART.roseDeep)}
+      ${svgText("hand", "Just", W / 2, 330, 72, ART.charcoal, { anchor: "middle" })}
+      ${svgText("hand", "Because", W / 2, 400, 72, ART.charcoal, { anchor: "middle" })}`),
+
+  "thank-you-hand": () =>
+    card(`${paper(W, H, ART.cream, ART.peach, 45)}
+      ${svgText("script", "thank", W / 2 - 10, 250, 96, ART.roseDeep, { anchor: "middle" })}
+      ${svgText("script", "you", W / 2 + 30, 345, 96, ART.roseDeep, { anchor: "middle" })}
+      ${doodleHeart(W / 2 - 10, 410, 22, ART.rose)}`),
+
+  "birthday-balloons": () => {
+    const cols = [ART.coral, "#7FB0C6", ART.gold, ART.roseDeep, ART.leafDeep];
+    const letters = "HAPPY".split("");
+    return card(`${paper(W, H, ART.cream, ART.sage, 46)}
+      ${confetti(W, H, 120, [ART.coral, "#9CC3D5", ART.butter, ART.rose, ART.leaf], 47, { x: 60, y: 160, w: 300, h: 260 })}
+      ${letters.map((l, i) => svgText("sansMedium", l, W / 2 - 88 + i * 44, 250, 46, cols[i % cols.length], { anchor: "middle" })).join("")}
+      ${svgText("script", "Birthday", W / 2, 336, 74, ART.charcoal, { anchor: "middle" })}`);
   },
 };
 

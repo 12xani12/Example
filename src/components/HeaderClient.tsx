@@ -98,7 +98,7 @@ export function DesktopNav({ links, groups }: { links: NavLink[]; groups: NavCat
           <li key={l.href} className="relative" ref={ref} onMouseEnter={() => setOpen(true)} onMouseLeave={() => setOpen(false)}>
             <button
               type="button"
-              className={`flex items-center gap-1 rounded-full px-3 py-2 text-[13px] uppercase tracking-[0.14em] transition hover:text-rose-deep ${isActive(pathname, "/categor") ? "text-rose-deep" : ""}`}
+              className={`flex items-center gap-1 rounded-full px-3 py-2 text-[15px] transition hover:text-rose-deep ${isActive(pathname, "/categor") ? "text-rose-deep" : ""}`}
               aria-expanded={open}
               aria-haspopup="true"
               onClick={() => setOpen((o) => !o)}
@@ -130,7 +130,7 @@ export function DesktopNav({ links, groups }: { links: NavLink[]; groups: NavCat
             <Link
               href={l.href}
               aria-current={isActive(pathname, l.href) ? "page" : undefined}
-              className={`rounded-full px-3 py-2 text-[13px] uppercase tracking-[0.14em] transition hover:text-rose-deep ${isActive(pathname, l.href) ? "text-rose-deep" : ""}`}
+              className={`rounded-full px-3 py-2 text-[15px] transition hover:text-rose-deep ${isActive(pathname, l.href) ? "text-rose-deep" : ""}`}
             >
               {l.label}
             </Link>

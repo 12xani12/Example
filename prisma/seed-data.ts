@@ -11,9 +11,9 @@ const occasion = (name: string, slug: string, description: string, tile?: SeedCa
 export const CATEGORIES: SeedCategory[] = [
   occasion("Birthday Cards", "birthday-cards", "Printable and personalised birthday cards for everyone on your list — download instantly and print at home.", { design: "birthday-blooms", tone: "blush" }, true),
   occasion("Celebration Cards", "celebration-cards", "Cards for every reason to celebrate, from milestones to little wins.", { design: "confetti-celebration", tone: "peach" }, true),
-  occasion("Thank You Cards", "thank-you-cards", "Say thank you beautifully with printable thank-you cards you can personalise.", { design: "thank-you", tone: "cream" }, true),
+  occasion("Thank You Cards", "thank-you-cards", "Say thank you beautifully with printable thank-you cards you can personalise.", { design: "thank-you-hand", tone: "cream" }, true),
   occasion("Holiday Cards", "holiday-cards", "Printable cards for Christmas, Easter and the holidays in between.", { design: "merry-christmas", tone: "sage" }, true),
-  occasion("Just Because", "just-because", "No occasion needed — thoughtful cards for brightening someone's day.", { design: "virtual-thanks", tone: "blush" }, true),
+  occasion("Just Because", "just-because", "No occasion needed — thoughtful cards for brightening someone's day.", { design: "just-because", tone: "blush" }, true),
   occasion("Anniversary Cards", "anniversary-cards", "Romantic printable anniversary cards to celebrate love and the years together.", { design: "anniversary", tone: "peach" }, true),
   occasion("Wedding Cards", "wedding-cards", "Elegant printable wedding cards for the happy couple.", { design: "wedding", tone: "cream" }, true),
   occasion("Baby & New Arrival Cards", "new-baby", "Sweet printable cards to welcome a new little one.", { design: "new-baby", tone: "sage" }, true),
@@ -41,12 +41,12 @@ export const CATEGORIES: SeedCategory[] = [
   { name: "To-Do Lists", slug: "to-do-lists", group: "OTHER_DOWNLOADS", description: "Pretty printable to-do lists." },
   { name: "Checklists", slug: "checklists", group: "OTHER_DOWNLOADS", home: true, description: "Printable checklists for parties, moving house, travel and more.", tile: { design: "checklist", tone: "blush" } },
   { name: "Habit Trackers", slug: "habit-trackers", group: "OTHER_DOWNLOADS", description: "Printable habit trackers to build routines you love." },
-  { name: "Printable Wall Art", slug: "wall-art", group: "OTHER_DOWNLOADS", home: true, description: "Botanical printable wall art — print, frame and enjoy.", tile: { design: "wallArt", tone: "cream" } },
+  { name: "Printable Wall Art", slug: "wall-art", group: "OTHER_DOWNLOADS", home: true, description: "Botanical and typographic printable wall art — print, frame and enjoy.", tile: { design: "good-things", tone: "cream" } },
   { name: "Gift Tags", slug: "gift-tags", group: "OTHER_DOWNLOADS", home: true, description: "Printable gift tags to finish every present beautifully.", tile: { design: "giftTags", tone: "blush" } },
   { name: "Party Decorations", slug: "party-decorations", group: "OTHER_DOWNLOADS", description: "Printable banners, toppers and party decorations." },
   { name: "Printable Games", slug: "printable-games", group: "OTHER_DOWNLOADS", description: "Printable games for parties and showers." },
-  { name: "Templates", slug: "templates", group: "OTHER_DOWNLOADS", home: true, description: "Editable and printable digital templates.", tile: { design: "invitation", tone: "sage" } },
-  { name: "Other Downloads", slug: "other-downloads", group: "OTHER_DOWNLOADS", home: true, description: "Everything else in the Cardly printable collection.", tile: { design: "checklist", tone: "peach" } },
+  { name: "Templates", slug: "templates", group: "OTHER_DOWNLOADS", home: true, description: "Editable and printable digital templates.", tile: { design: "you-are-amazing", tone: "sage" } },
+  { name: "Other Downloads", slug: "other-downloads", group: "OTHER_DOWNLOADS", home: true, description: "Everything else in the Cardly printable collection.", tile: { design: "dream-plan", tone: "peach" } },
 ];
 
 const CARD_INCLUDED = [
@@ -76,7 +76,9 @@ export type SeedProduct = {
   ready: number;
   personalised?: number;
   art: { kind: "card"; design: DesignId; inside: "rose" | "sage" | "peach" | "holly"; tone: MockupTone; readyMadeMessage?: string; defaultFont?: string }
-    | { kind: "download"; design: DownloadDesign; tone: MockupTone; card?: boolean };
+    | { kind: "download"; design: DownloadDesign; tone: MockupTone; card?: boolean }
+    // A5 card artwork reused as an A4 print (both are √2 proportions).
+    | { kind: "print"; design: DesignId; tone: MockupTone };
   whatsIncluded?: string;
   sizeInfo?: string;
 };
@@ -104,8 +106,8 @@ export const PRODUCTS: SeedProduct[] = [
     title: "Happy Birthday Blooms", slug: "happy-birthday-blooms", featured: true, isNew: true,
     categories: ["birthday-cards"],
     short: "A beautifully illustrated floral birthday card, perfect for making someone's day extra special.",
-    description: "Soft blush peonies, garden roses and trailing greenery frame a hand-lettered “Happy Birthday” on this elegant printable card.\n\nChoose the ready-made version with a clean, blank inside for writing your own note by hand, or personalise the inside with your message before you buy — we'll set it beautifully and deliver a print-ready PDF instantly.",
-    tags: ["birthday", "floral", "flowers", "peony", "for her", "printable birthday card"],
+    description: "A meadow of pastel wildflowers grows beneath hand-lettered “Happy Birthday” script on this delicate printable card.\n\nChoose the ready-made version with a clean, blank inside for writing your own note by hand, or personalise the inside with your message before you buy — we'll set it beautifully and deliver a print-ready PDF instantly.",
+    tags: ["birthday", "floral", "flowers", "wildflowers", "for her", "printable birthday card"],
     art: { kind: "card", design: "birthday-blooms", inside: "rose", tone: "blush" },
   }),
   card({
@@ -282,5 +284,59 @@ export const PRODUCTS: SeedProduct[] = [
     whatsIncluded: "1 × printable PDF (A4 portrait)",
     sizeInfo: "A4 (210 × 297 mm)",
     art: { kind: "download", design: "checklist", tone: "peach" },
+  },
+card({
+    title: "You Are Amazing", slug: "you-are-amazing", featured: true, isNew: true,
+    categories: ["just-because", "congratulations", "other-celebrations"],
+    short: "Simple, spaced lettering for telling someone exactly how amazing they are.",
+    description: "Clean typography and a tiny blush heart — a modern card for encouragement, congratulations or just because.",
+    tags: ["encouragement", "just because", "typography", "minimal", "friendship"],
+    art: { kind: "card", design: "you-are-amazing", inside: "rose", tone: "cream" },
+  }),
+  card({
+    title: "Just Because", slug: "just-because-heart",
+    categories: ["just-because", "valentines-day"],
+    short: "A big rosy heart and hand-lettered “Just Because”.",
+    description: "No occasion needed. A cheerful pink card to brighten someone's day.",
+    tags: ["just because", "heart", "love", "friendship", "pink"],
+    art: { kind: "card", design: "just-because", inside: "rose", tone: "blush" },
+  }),
+  card({
+    title: "Thank You Script", slug: "thank-you-script",
+    categories: ["thank-you-cards"],
+    short: "Flowing hand-lettered “thank you” with a little doodled heart.",
+    description: "A simple, elegant thank-you card in dusty rose script — lovely for teachers, hosts and helpers.",
+    tags: ["thank you", "script", "teacher", "minimal"],
+    art: { kind: "card", design: "thank-you-hand", inside: "rose", tone: "cream" },
+  }),
+  card({
+    title: "Happy Birthday Confetti", slug: "happy-birthday-confetti",
+    categories: ["birthday-cards", "celebration-cards"],
+    short: "Colourful lettering and pastel confetti for a happy, playful birthday.",
+    description: "Bright and fun — perfect for kids' birthdays and anyone who loves a party.",
+    tags: ["birthday", "confetti", "kids", "colourful", "party"],
+    art: { kind: "card", design: "birthday-balloons", inside: "peach", tone: "sage" },
+  }),
+  {
+    title: "Good Things Take Time — Wall Art", slug: "good-things-take-time-wall-art", type: "WALL_ART", isNew: true,
+    categories: ["wall-art"],
+    short: "A gentle hand-lettered reminder to frame for your desk or home.",
+    description: "Hand-lettered “Good Things Take Time” print with a small heart. Print on A4 and frame.",
+    tags: ["wall art", "quote", "motivation", "typography", "print"],
+    ready: 500,
+    whatsIncluded: "1 × high-resolution printable PDF (A4 portrait)",
+    sizeInfo: "A4 (210 × 297 mm); also scales to A5 or A3",
+    art: { kind: "print", design: "good-things", tone: "cream" },
+  },
+  {
+    title: "Dream Plan Do Repeat — Wall Art", slug: "dream-plan-do-repeat-wall-art", type: "WALL_ART",
+    categories: ["wall-art", "other-downloads"],
+    short: "Minimal typographic print for a calm, motivating workspace.",
+    description: "Spaced capital lettering — DREAM, PLAN, DO, REPEAT — on soft blush paper.",
+    tags: ["wall art", "quote", "motivation", "minimal", "office"],
+    ready: 500,
+    whatsIncluded: "1 × high-resolution printable PDF (A4 portrait)",
+    sizeInfo: "A4 (210 × 297 mm); also scales to A5 or A3",
+    art: { kind: "print", design: "dream-plan", tone: "peach" },
   },
 ];

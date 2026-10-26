@@ -130,6 +130,8 @@ model Category {
   // Shown in the homepage "Shop by Occasion" / "More Than Just Cards" tiles.
   showOnHome  Boolean           @default(false)
   imageKey    String?
+  // Wide banner shown at the top of the category page.
+  bannerKey   String?
   createdAt   DateTime          @default(now())
   updatedAt   DateTime          @updatedAt
   products    ProductCategory[]

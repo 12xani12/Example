@@ -11,6 +11,9 @@ type Props = {
   /** Filters fixed by the page (e.g. category page) and hidden from the UI. */
   fixed?: Partial<ShopQuery>;
   hide?: ("category" | "type" | "option" | "format")[];
+  /** Compact layout (category pages): filters tucked into a dropdown instead of a sidebar. */
+  compact?: boolean;
+  breadcrumb?: React.ReactNode;
 };
 
 function buildHref(basePath: string, query: ShopQuery, patch: Partial<ShopQuery>) {
@@ -20,7 +23,7 @@ function buildHref(basePath: string, query: ShopQuery, patch: Partial<ShopQuery>
   return qs ? `${basePath}?${qs}` : basePath;
 }
 
-export async function Catalog({ basePath, query, fixed = {}, hide = [] }: Props) {
+export async function Catalog({ basePath, query, fixed = {}, hide = [], compact = false, breadcrumb }: Props) {
   const merged = { ...query, ...fixed };
   const [result, categories] = await Promise.all([searchProducts(merged), getVisibleCategories()]);
   const occasions = categories.filter((c) => c.group !== "OTHER_DOWNLOADS");
@@ -96,19 +99,22 @@ export async function Catalog({ basePath, query, fixed = {}, hide = [] }: Props)
   );
 
   return (
-    <div className="grid gap-8 lg:grid-cols-[260px_1fr] lg:gap-12">
-      <aside aria-label="Filters" className="hidden lg:block">
-        <div className="sticky top-28 rounded-2xl bg-white p-6 shadow-soft">{filterForm("d")}</div>
-      </aside>
+    <div className={compact ? "" : "grid gap-8 lg:grid-cols-[260px_1fr] lg:gap-12"}>
+      {!compact && (
+        <aside aria-label="Filters" className="hidden lg:block">
+          <div className="sticky top-28 rounded-2xl bg-white p-6 shadow-soft">{filterForm("d")}</div>
+        </aside>
+      )}
       <div>
-        <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-          <details className="w-full rounded-2xl bg-white shadow-soft lg:hidden">
-            <summary className="cursor-pointer list-none px-5 py-3.5 text-sm font-medium uppercase tracking-[0.14em]">
-              Filter & search {activeFilters.length > 0 && <span className="ml-1 text-rose-deep">({activeFilters.length})</span>}
+        <div className="relative mb-6 flex flex-wrap items-center justify-between gap-3">
+          {breadcrumb && <div className="w-full sm:w-auto">{breadcrumb}</div>}
+          <details className={`group rounded-2xl bg-white shadow-soft ${compact ? "w-full sm:order-last sm:w-auto" : "w-full lg:hidden"}`}>
+            <summary className="cursor-pointer list-none px-5 py-2.5 text-sm font-medium">
+              Filter {activeFilters.length > 0 && <span className="ml-1 text-rose-deep">({activeFilters.length})</span>}
             </summary>
-            <div className="border-t border-charcoal/5 p-5">{filterForm("m")}</div>
+            <div className={`border-t border-charcoal/5 p-5 ${compact ? "sm:absolute sm:right-0 sm:top-full sm:z-20 sm:mt-2 sm:w-80 sm:rounded-2xl sm:border-0 sm:bg-white sm:shadow-lift" : ""}`}>{filterForm("m")}</div>
           </details>
-          <p className="text-[15px] text-charcoal-soft" aria-live="polite">
+          <p className={`text-[15px] text-charcoal-soft ${compact ? "sm:ml-auto" : ""}`} aria-live="polite">
             {result.total} {result.total === 1 ? "design" : "designs"}
           </p>
           <AutoSubmitForm action={basePath} className="flex items-center gap-2">

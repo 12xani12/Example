@@ -59,6 +59,19 @@ export async function saveCategory(form: FormData) {
     if (!stored) fail(id, `${file.name} isn't a supported image (use JPG, PNG or WebP).`);
     imageKey = stored.key;
   }
+  const bannerFile = form.get("banner");
+  let bannerKey: string | undefined;
+  if (bannerFile instanceof File && bannerFile.size > 0) {
+    if (bannerFile.size > MAX_BYTES) fail(id, "Banner images must be under 20 MB.");
+    let stored: { key: string } | null = null;
+    try {
+      stored = await storePublicImage(Buffer.from(await bannerFile.arrayBuffer()), "categories");
+    } catch {
+      stored = null;
+    }
+    if (!stored) fail(id, `${bannerFile.name} isn't a supported image (use JPG, PNG or WebP).`);
+    bannerKey = stored.key;
+  }
 
   const data = {
     name,
@@ -68,6 +81,7 @@ export async function saveCategory(form: FormData) {
     isHidden: form.get("isHidden") === "on",
     showOnHome: form.get("showOnHome") === "on",
     ...(imageKey ? { imageKey } : {}),
+    ...(bannerKey ? { bannerKey } : {}),
   };
 
   let savedId: string;
@@ -76,6 +90,7 @@ export async function saveCategory(form: FormData) {
     const sortOrder = existing.group === group ? existing.sortOrder : await nextSortOrder(group);
     await prisma.category.update({ where: { id: existing.id }, data: { ...data, sortOrder } });
     if (imageKey && existing.imageKey) await deletePublicImage(existing.imageKey).catch(() => undefined);
+    if (bannerKey && existing.bannerKey) await deletePublicImage(existing.bannerKey).catch(() => undefined);
     if (existing.slug !== slug) await updateSeasonalSlug(existing.slug, slug);
     savedId = existing.id;
   } else {
@@ -120,6 +135,7 @@ export async function deleteCategory(form: FormData) {
   // Products stay; only their links to this category (ProductCategory) are removed.
   await prisma.category.delete({ where: { id } });
   if (category.imageKey) await deletePublicImage(category.imageKey).catch(() => undefined);
+  if (category.bannerKey) await deletePublicImage(category.bannerKey).catch(() => undefined);
   await updateSeasonalSlug(category.slug, "");
   revalidatePath("/", "layout");
   redirect("/admin/categories?deleted=1");

@@ -33,7 +33,15 @@ export function CategoryForm({ category }: { category?: Category }) {
         <div>
           <label htmlFor="image" className="label text-xs">{category?.imageKey ? "Replace tile image" : "Tile image"} (JPG, PNG or WebP)</label>
           <input id="image" name="image" type="file" accept="image/*" className="text-sm" />
-          <p className="mt-1 text-xs text-charcoal-muted">A square image works best.</p>
+          <p className="mt-1 text-xs text-charcoal-muted">A 5:4 landscape image works best.</p>
+        </div>
+      </div>
+      <div className="flex flex-wrap items-end gap-4 rounded-xl border border-dashed border-charcoal/20 p-4">
+        {category?.bannerKey && <img src={imageSrc(category.bannerKey, "sm")} alt="Current banner" className="h-20 w-64 rounded-lg bg-peach object-cover" />}
+        <div>
+          <label htmlFor="banner" className="label text-xs">{category?.bannerKey ? "Replace page banner" : "Page banner"} (JPG, PNG or WebP)</label>
+          <input id="banner" name="banner" type="file" accept="image/*" className="text-sm" />
+          <p className="mt-1 text-xs text-charcoal-muted">Shown behind the title on the category page. Wide images (about 1600 × 400 px) with a calm centre work best.</p>
         </div>
       </div>
       <div><button type="submit" className="btn-primary btn-sm">{category ? "Save category" : "Create category"}</button></div>
