@@ -3,6 +3,8 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   serverExternalPackages: ["sharp", "@prisma/client", "nodemailer"],
   poweredByHeader: false,
+  // Card fonts are read from disk to generate PDFs; make sure serverless bundles include them.
+  outputFileTracingIncludes: { "/**": ["./public/fonts/**"] },
   experimental: {
     serverActions: { bodySizeLimit: "60mb" },
   },

@@ -94,7 +94,12 @@ class S3Storage implements Storage {
 let instance: Storage | null = null;
 
 export function storage(): Storage {
-  if (!instance) instance = env.storageDriver === "s3" ? new S3Storage() : new LocalStorage(env.storageLocalDir);
+  if (!instance) {
+    if (env.isProduction && env.storageDriver === "local" && process.env.VERCEL) {
+      console.error("[storage] STORAGE_DRIVER=local on a serverless host loses files between requests. Configure S3-compatible storage.");
+    }
+    instance = env.storageDriver === "s3" ? new S3Storage() : new LocalStorage(env.storageLocalDir);
+  }
   return instance;
 }
 

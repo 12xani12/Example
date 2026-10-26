@@ -1,3 +1,6 @@
+-- CreateSchema
+CREATE SCHEMA IF NOT EXISTS "public";
+
 -- CreateEnum
 CREATE TYPE "Role" AS ENUM ('CUSTOMER', 'ADMIN');
 
@@ -231,8 +234,6 @@ CREATE TABLE "Order" (
     "discountCodeText" TEXT,
     "stripeCheckoutSessionId" TEXT,
     "stripePaymentIntentId" TEXT,
-    "accessTokenHash" TEXT,
-    "accessExpiresAt" TIMESTAMP(3),
     "paidAt" TIMESTAMP(3),
     "confirmationSentAt" TIMESTAMP(3),
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -433,9 +434,6 @@ CREATE UNIQUE INDEX "Order_stripeCheckoutSessionId_key" ON "Order"("stripeChecko
 CREATE UNIQUE INDEX "Order_stripePaymentIntentId_key" ON "Order"("stripePaymentIntentId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Order_accessTokenHash_key" ON "Order"("accessTokenHash");
-
--- CreateIndex
 CREATE INDEX "Order_email_idx" ON "Order"("email");
 
 -- CreateIndex
@@ -524,3 +522,4 @@ ALTER TABLE "_DiscountCategories" ADD CONSTRAINT "_DiscountCategories_A_fkey" FO
 
 -- AddForeignKey
 ALTER TABLE "_DiscountCategories" ADD CONSTRAINT "_DiscountCategories_B_fkey" FOREIGN KEY ("B") REFERENCES "DiscountCode"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+

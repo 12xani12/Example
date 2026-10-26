@@ -17,7 +17,7 @@ export async function issueAccessToken(orderId: string) {
   return `${exp}.${hmac(`order:${orderId}:${exp}`)}`;
 }
 
-function verifyAccessToken(orderId: string, token: string): "valid" | "expired" | "invalid" {
+export function verifyAccessToken(orderId: string, token: string): "valid" | "expired" | "invalid" {
   const [exp, sig] = token.split(".");
   if (!exp || !sig || !/^\d+$/.test(exp)) return "invalid";
   if (!safeEqual(sig, hmac(`order:${orderId}:${exp}`))) return "invalid";

@@ -1,5 +1,5 @@
 // Sample artwork for Cardly's demonstration products.
-import { ART, balloon, berries, blossom, bloom, cluster, confetti, daisy, eucalyptus, heart, hollyLeaf, leaf, paper, rng, sprig, star, wreath } from "./flora";
+import { ART, balloon, berries, blossom, cluster, confetti, daisy, eucalyptus, heart, hollyLeaf, leaf, paper, rng, sprig, star, wreath } from "./flora";
 import { svgText } from "./text";
 
 const W = 420;
