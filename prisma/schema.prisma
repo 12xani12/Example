@@ -1,0 +1,439 @@
+// Cardly data model. Money is always stored as integer cents (AUD).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  CUSTOMER
+  ADMIN
+}
+
+enum ProductType {
+  GREETING_CARD
+  VIRTUAL_CARD
+  INVITATION
+  PLANNER
+  WALL_ART
+  GIFT_TAG
+  CHECKLIST
+  TEMPLATE
+  PARTY_DECORATION
+  PRINTABLE_GAME
+  OTHER
+}
+
+enum ProductFormat {
+  PRINTABLE
+  VIRTUAL
+}
+
+enum ProductStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum VariantKind {
+  READY_MADE
+  PERSONALISED
+}
+
+enum CategoryGroup {
+  GREETING_CARDS
+  VIRTUAL_CARDS
+  OTHER_DOWNLOADS
+}
+
+enum ImageRole {
+  FRONT
+  INSIDE
+  BACK
+  LIFESTYLE
+  OTHER
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  FAILED
+  CANCELLED
+  REFUNDED
+  PARTIALLY_REFUNDED
+}
+
+enum FulfilmentStatus {
+  PENDING
+  PROCESSING
+  FULFILLED
+  FAILED
+}
+
+enum DiscountType {
+  PERCENT
+  FIXED
+}
+
+enum SubscriberStatus {
+  PENDING
+  SUBSCRIBED
+  UNSUBSCRIBED
+}
+
+model User {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  name         String?
+  passwordHash String?
+  role         Role      @default(CUSTOMER)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  sessions     Session[]
+  orders       Order[]
+  resetTokens  PasswordResetToken[]
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  tokenHash String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model PasswordResetToken {
+  id        String    @id @default(cuid())
+  tokenHash String    @unique
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+}
+
+model Category {
+  id          String            @id @default(cuid())
+  slug        String            @unique
+  name        String
+  description String?
+  group       CategoryGroup
+  sortOrder   Int               @default(0)
+  isHidden    Boolean           @default(false)
+  // Shown in the homepage "Shop by Occasion" / "More Than Just Cards" tiles.
+  showOnHome  Boolean           @default(false)
+  imageKey    String?
+  // Wide banner shown at the top of the category page.
+  bannerKey   String?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  products    ProductCategory[]
+  discounts   DiscountCode[]    @relation("DiscountCategories")
+}
+
+model Product {
+  id               String            @id @default(cuid())
+  slug             String            @unique
+  title            String
+  shortDescription String            @default("")
+  description      String            @default("")
+  whatsIncluded    String            @default("")
+  sizeInfo         String            @default("")
+  type             ProductType
+  format           ProductFormat     @default(PRINTABLE)
+  status           ProductStatus     @default(DRAFT)
+  isFeatured       Boolean           @default(false)
+  isNewArrival     Boolean           @default(false)
+  // Demonstration products are visible but cannot be purchased.
+  isDemo           Boolean           @default(false)
+  tags             String[]          @default([])
+  sortOrder        Int               @default(0)
+  seoTitle         String?
+  seoDescription   String?
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  variants         ProductVariant[]
+  categories       ProductCategory[]
+  images           ProductImage[]
+  files            DownloadFile[]
+  template         CardTemplate?
+  orderItems       OrderItem[]
+  cartItems        CartItem[]
+
+  @@index([status])
+}
+
+model ProductVariant {
+  id         String      @id @default(cuid())
+  productId  String
+  product    Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
+  kind       VariantKind
+  priceCents Int
+  active     Boolean     @default(true)
+  orderItems OrderItem[]
+  cartItems  CartItem[]
+
+  @@unique([productId, kind])
+}
+
+model ProductCategory {
+  productId  String
+  categoryId String
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@id([productId, categoryId])
+}
+
+model ProductImage {
+  id        String    @id @default(cuid())
+  productId String
+  product   Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  // Public storage key prefix; "-sm.webp" and "-lg.webp" renditions exist.
+  key       String
+  alt       String    @default("")
+  role      ImageRole @default(OTHER)
+  sortOrder Int       @default(0)
+  width     Int       @default(0)
+  height    Int       @default(0)
+  createdAt DateTime  @default(now())
+}
+
+// A private, purchasable deliverable uploaded by an admin.
+model DownloadFile {
+  id          String       @id @default(cuid())
+  productId   String
+  product     Product      @relation(fields: [productId], references: [id], onDelete: Cascade)
+  // Which purchase option receives this file. Null = every option.
+  variantKind VariantKind?
+  key         String
+  filename    String
+  contentType String
+  sizeBytes   Int
+  createdAt   DateTime     @default(now())
+}
+
+// Print/personalisation configuration for a greeting card or virtual card.
+// Coordinates are PDF points on a single A5 panel (419.53 x 595.28), origin top-left.
+model CardTemplate {
+  id                String   @id @default(cuid())
+  productId         String   @unique
+  product           Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  personalisable    Boolean  @default(true)
+  layout            String   @default("A4_FOLDED_A5")
+  // Private high-resolution artwork (PNG/JPG) used for generated files.
+  frontArtKey       String?
+  insideArtKey      String?
+  backArtKey        String?
+  // Public web-resolution previews used in the editor.
+  frontPreviewKey   String?
+  insidePreviewKey  String?
+  textX             Float    @default(52)
+  textY             Float    @default(120)
+  textWidth         Float    @default(315)
+  textHeight        Float    @default(360)
+  allowedFonts      String[] @default(["script", "serif", "sans", "handwritten"])
+  defaultFont       String   @default("serif")
+  defaultFontSize   Float    @default(18)
+  minFontSize       Float    @default(12)
+  maxFontSize       Float    @default(30)
+  allowedColours    String[] @default(["#302C2B", "#B4596B", "#5E6F55"])
+  defaultColour     String   @default("#302C2B")
+  defaultAlign      String   @default("center")
+  // Text printed inside the ready-made version. Empty = blank inside.
+  readyMadeMessage  String   @default("")
+  updatedAt         DateTime @updatedAt
+}
+
+model Cart {
+  id           String     @id
+  discountCode String?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  items        CartItem[]
+}
+
+model CartItem {
+  id              String         @id @default(cuid())
+  cartId          String
+  cart            Cart           @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  productId       String
+  product         Product        @relation(fields: [productId], references: [id], onDelete: Cascade)
+  variantId       String
+  variant         ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  personalisation Json?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  @@index([cartId])
+}
+
+model Order {
+  id                      String                @id @default(cuid())
+  number                  String                @unique
+  email                   String
+  userId                  String?
+  user                    User?                 @relation(fields: [userId], references: [id], onDelete: SetNull)
+  status                  OrderStatus           @default(PENDING)
+  fulfilmentStatus        FulfilmentStatus      @default(PENDING)
+  fulfilmentError         String?
+  currency                String                @default("aud")
+  subtotalCents           Int
+  discountCents           Int                   @default(0)
+  gstCents                Int                   @default(0)
+  totalCents              Int
+  refundedCents           Int                   @default(0)
+  // Tax settings captured at checkout so receipts stay accurate.
+  gstMode                 String
+  businessName            String
+  abn                     String?
+  discountCodeId          String?
+  discountCode            DiscountCode?         @relation(fields: [discountCodeId], references: [id], onDelete: SetNull)
+  discountCodeText        String?
+  stripeCheckoutSessionId String?               @unique
+  stripePaymentIntentId   String?               @unique
+  paidAt                  DateTime?
+  confirmationSentAt      DateTime?
+  createdAt               DateTime              @default(now())
+  updatedAt               DateTime              @updatedAt
+  items                   OrderItem[]
+  payments                Payment[]
+  entitlements            DownloadEntitlement[]
+
+  @@index([email])
+  @@index([status, createdAt])
+}
+
+model OrderItem {
+  id               String                @id @default(cuid())
+  orderId          String
+  order            Order                 @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId        String?
+  product          Product?              @relation(fields: [productId], references: [id], onDelete: SetNull)
+  variantId        String?
+  variant          ProductVariant?       @relation(fields: [variantId], references: [id], onDelete: SetNull)
+  title            String
+  variantKind      VariantKind
+  productType      ProductType
+  format           ProductFormat
+  unitPriceCents   Int
+  discountCents    Int                   @default(0)
+  personalisation  Json?
+  entitlements     DownloadEntitlement[]
+}
+
+model Payment {
+  id          String   @id @default(cuid())
+  orderId     String
+  order       Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  provider    String
+  providerRef String
+  amountCents Int
+  status      String
+  createdAt   DateTime @default(now())
+
+  @@unique([provider, providerRef])
+}
+
+model DownloadEntitlement {
+  id            String    @id @default(cuid())
+  orderId       String
+  order         Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderItemId   String
+  orderItem     OrderItem @relation(fields: [orderItemId], references: [id], onDelete: Cascade)
+  key           String
+  filename      String
+  contentType   String
+  label         String
+  downloadCount Int       @default(0)
+  maxDownloads  Int?
+  lastAccessAt  DateTime?
+  revokedAt     DateTime?
+  createdAt     DateTime  @default(now())
+
+  @@unique([orderItemId, filename])
+}
+
+model DownloadEvent {
+  id            String   @id @default(cuid())
+  entitlementId String
+  createdAt     DateTime @default(now())
+
+  @@index([createdAt])
+}
+
+model ProcessedWebhookEvent {
+  id         String   @id
+  type       String
+  createdAt  DateTime @default(now())
+}
+
+model DiscountCode {
+  id                String       @id @default(cuid())
+  code              String       @unique
+  description       String       @default("")
+  type              DiscountType
+  // PERCENT: whole percent (e.g. 15). FIXED: cents.
+  value             Int
+  minSubtotalCents  Int          @default(0)
+  startsAt          DateTime?
+  expiresAt         DateTime?
+  maxUses           Int?
+  usedCount         Int          @default(0)
+  active            Boolean      @default(true)
+  categories        Category[]   @relation("DiscountCategories")
+  orders            Order[]
+  createdAt         DateTime     @default(now())
+}
+
+model NewsletterSubscriber {
+  id               String           @id @default(cuid())
+  email            String           @unique
+  status           SubscriberStatus @default(PENDING)
+  consentText      String
+  consentAt        DateTime
+  confirmedAt      DateTime?
+  unsubscribedAt   DateTime?
+  token            String           @unique
+  createdAt        DateTime         @default(now())
+}
+
+model ContactMessage {
+  id          String   @id @default(cuid())
+  name        String
+  email       String
+  orderNumber String?
+  subject     String
+  message     String
+  handled     Boolean  @default(false)
+  createdAt   DateTime @default(now())
+}
+
+model Setting {
+  key       String   @id
+  value     Json
+  updatedAt DateTime @updatedAt
+}
+
+model EmailLog {
+  id        String   @id @default(cuid())
+  to        String
+  subject   String
+  template  String
+  status    String
+  error     String?
+  createdAt DateTime @default(now())
+}
+
+model RateLimit {
+  key       String   @id
+  count     Int
+  resetAt   DateTime
+}

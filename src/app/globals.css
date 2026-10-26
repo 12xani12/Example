@@ -1,0 +1,47 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face { font-family: "CardlyScript"; src: url("/fonts/GreatVibes-Regular.ttf") format("truetype"); font-display: swap; }
+@font-face { font-family: "CardlySerif"; src: url("/fonts/CormorantGaramond-Medium.ttf") format("truetype"); font-display: swap; }
+@font-face { font-family: "CardlySans"; src: url("/fonts/Jost-Light.ttf") format("truetype"); font-display: swap; }
+@font-face { font-family: "CardlyHand"; src: url("/fonts/Caveat-Medium.ttf") format("truetype"); font-display: swap; }
+
+@layer base {
+  html { -webkit-tap-highlight-color: transparent; scroll-behavior: smooth; }
+  body { @apply bg-cream font-sans text-charcoal antialiased; font-weight: 400; }
+  h1, h2, h3, h4 { @apply font-serif text-charcoal; font-weight: 600; letter-spacing: -0.005em; }
+  ::selection { background: #F5D9D8; }
+  :focus-visible { outline: 2px solid #B4596B; outline-offset: 3px; border-radius: 6px; }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+  }
+}
+
+@layer components {
+  .container-page { @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8; }
+  .btn { @apply inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-medium uppercase tracking-[0.12em] transition duration-200 disabled:cursor-not-allowed disabled:opacity-50; }
+  .btn-primary { @apply btn bg-rose-deep text-white shadow-soft hover:bg-rose-deeper hover:shadow-card active:translate-y-px; }
+  .btn-secondary { @apply btn border border-charcoal/20 bg-white text-charcoal hover:border-rose-deep hover:text-rose-deep; }
+  .btn-soft { @apply btn bg-blush text-charcoal hover:bg-blush-light; }
+  .btn-sm { @apply px-4 py-2 text-xs; }
+  .link { @apply text-rose-deep underline decoration-rose/40 underline-offset-4 hover:decoration-rose-deep; }
+  .eyebrow { @apply text-xs font-medium uppercase tracking-[0.24em] text-rose-deep; }
+  .card-surface { @apply rounded-2xl bg-white shadow-soft; }
+  .input { @apply block w-full rounded-xl border border-charcoal/15 bg-white px-4 py-3 text-base text-charcoal placeholder:text-charcoal-muted/70 transition focus:border-rose-deep focus:outline-none focus:ring-2 focus:ring-rose/30; }
+  .label { @apply mb-1.5 block text-sm font-medium text-charcoal; }
+  .chip { @apply inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-medium uppercase tracking-wider; }
+  .prose-cardly { @apply max-w-none text-[17px] leading-relaxed text-charcoal-soft; }
+  .prose-cardly h2 { @apply mb-3 mt-10 text-3xl; }
+  .prose-cardly h3 { @apply mb-2 mt-8 text-2xl; }
+  .prose-cardly p { @apply mb-4; }
+  .prose-cardly ul { @apply mb-4 list-disc space-y-1.5 pl-6; }
+  .prose-cardly ol { @apply mb-4 list-decimal space-y-1.5 pl-6; }
+  .prose-cardly a { @apply link; }
+  .prose-cardly strong { @apply font-medium text-charcoal; }
+}
+
+.page-enter { animation: fade-in 0.45s ease-out both; }
+@keyframes fade-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+.flourish::before, .flourish::after { content: ""; display: inline-block; height: 1px; width: 2.5rem; background: currentColor; opacity: 0.35; vertical-align: middle; margin: 0 0.9rem; }
